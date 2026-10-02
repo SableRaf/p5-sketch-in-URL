@@ -27,3 +27,9 @@ Open `index.html` in a browser (or serve the folder with any static server). Edi
 - Long sketches make long URLs, and some browsers, chat apps, and link shorteners truncate them
 - No compression yet
 - Anyone with the link can read the code
+
+## AI Disclosure
+
+Though most of this project's code and documentation were written or edited with the help of LLM-based tools including Claude Code and OpenAI Codex, a real human (me, @SableRaf) made all the design decisions, tested the code, and verified that everything works as described.
+
+If you ask me a question about this project, I will use my human brain to think about the answer, and type it out with my grubby little human fingers.
