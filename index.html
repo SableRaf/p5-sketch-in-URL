@@ -193,6 +193,10 @@
       stroke-linejoin: round;
     }
 
+    #copy .icon-check { display: none; }
+    #copy.copied .icon-link { display: none; }
+    #copy.copied .icon-check { display: block; }
+
     #tooltip {
       position: fixed;
       z-index: 1000;
@@ -346,7 +350,8 @@
     <input id="share-url" type="text" readonly spellcheck="false" />
     <span class="status" id="status"></span>
     <button class="icon-btn" id="copy" data-tip="Copy share URL" aria-label="Copy share URL">
-      <svg viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7" /><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" /></svg>
+      <svg class="icon-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.5.5l3-3a5 5 0 0 0-7-7l-1.7 1.7" /><path d="M14 11a5 5 0 0 0-7.5-.5l-3 3a5 5 0 0 0 7 7l1.7-1.7" /></svg>
+      <svg class="icon-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5" /></svg>
     </button>
     <a class="icon-btn" id="open" href="#" target="_blank" rel="noopener" data-tip="Open share URL in new tab" aria-label="Open share URL in new tab">
       <svg viewBox="0 0 24 24"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6" /><path d="M15 3h6v6" /><path d="M10 14 21 3" /></svg>
@@ -655,6 +660,9 @@ function draw() {
       try {
         await navigator.clipboard.writeText(url);
         flash(el, "Copied share URL");
+        el.classList.add("copied");
+        clearTimeout(el.copiedTimer);
+        el.copiedTimer = setTimeout(() => el.classList.remove("copied"), 1200);
       } catch {
         flash(el, "Copy failed");
       }
