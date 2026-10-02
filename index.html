@@ -5,6 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Sketch-in-URL Fragment PoC</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.css" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inconsolata:wght@400;700&display=swap" />
   <style>
     :root {
       --bg: #ffffff;
@@ -226,8 +229,43 @@
 
     .CodeMirror {
       height: 100%;
-      font: 14px/1.5 ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      font: 16px/1.2 Inconsolata, monospace;
     }
+
+    /* p5.js web editor light theme (client/styles/components/_editor.scss). */
+    .cm-s-p5-light.CodeMirror { background: #fbfbfb; color: #333; }
+    .cm-s-p5-light .CodeMirror-lines { padding-top: 25px; }
+    .cm-s-p5-light pre.CodeMirror-line,
+    .cm-s-p5-light pre.CodeMirror-line-like { padding: 0 4px; }
+    .cm-s-p5-light .CodeMirror-gutters { min-width: 48px; background: #fbfbfb; border-right: 1px solid #d9d9d9; }
+    .cm-s-p5-light .CodeMirror-linenumber { color: #666; }
+    .cm-s-p5-light .CodeMirror-cursor { border-left-color: #333; }
+    .cm-s-p5-light .CodeMirror-selected,
+    .cm-s-p5-light.CodeMirror-focused .CodeMirror-selected,
+    .cm-s-p5-light .CodeMirror-line::selection,
+    .cm-s-p5-light .CodeMirror-line > span::selection,
+    .cm-s-p5-light .CodeMirror-line > span > span::selection { background: #d9d9d9; }
+    .cm-s-p5-light .CodeMirror-activeline-background { background: #cfcfcf44; }
+    .cm-s-p5-light .CodeMirror-matchingbracket { color: inherit !important; outline: 1px solid #333; outline-offset: 1px; }
+
+    .cm-s-p5-light .cm-comment { color: #747474; }
+    .cm-s-p5-light .cm-variable,
+    .cm-s-p5-light .cm-variable-2,
+    .cm-s-p5-light .cm-variable-3,
+    .cm-s-p5-light .cm-type,
+    .cm-s-p5-light .cm-def { color: #0b7ca9; }
+    .cm-s-p5-light .cm-string,
+    .cm-s-p5-light .cm-string-2 { color: #47820a; }
+    .cm-s-p5-light .cm-regexp { color: #a06801; }
+    .cm-s-p5-light .cm-number { color: #333; }
+    .cm-s-p5-light .cm-atom { color: #d52889; }
+    .cm-s-p5-light .cm-keyword,
+    .cm-s-p5-light .cm-operator { color: #7a5a3a; }
+    .cm-s-p5-light .cm-tag { color: #d52889; }
+    .cm-s-p5-light .cm-property,
+    .cm-s-p5-light .cm-attribute { color: #333; }
+    .cm-s-p5-light .cm-p5-function { color: #0b7ca9; font-weight: bold; }
+    .cm-s-p5-light .cm-p5-variable { color: #d52889; }
 
     iframe {
       width: 100%;
@@ -290,6 +328,8 @@
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/codemirror.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/mode/javascript/javascript.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/selection/active-line.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/codemirror/5.65.16/addon/edit/matchbrackets.min.js"></script>
   <script>
     // One shared tooltip so only a single tip can show at a time.
     const tooltipEl = document.querySelector("#tooltip");
@@ -347,9 +387,90 @@ function draw() {
   circle(width / 2, height / 2, 100);
 }`;
 
+    // Keyword lists from the p5.js web editor (client/utils/p5-keywords.js).
+    const p5Functions = new Set(`
+      describe describeElement textOutput gridOutput alpha blue brightness color green hue
+      lerpColor lightness red saturation beginClip endClip clip background clear colorMode fill
+      noFill noStroke stroke erase noErase arc ellipse circle line point quad rect square
+      triangle ellipseMode noSmooth rectMode smooth strokeCap strokeJoin strokeWeight bezier
+      bezierDetail bezierPoint bezierTangent curve curveDetail curveTightness curvePoint
+      curveTangent beginContour beginShape bezierVertex curveVertex endContour endShape
+      quadraticVertex vertex normal print cursor frameRate getTargetFrameRate noCursor
+      windowResized fullscreen pixelDensity displayDensity getURL getURLPath getURLParams
+      preload setup draw remove createCanvas resizeCanvas noCanvas createGraphics
+      createFramebuffer clearDepth blendMode noLoop loop isLooping push pop redraw p5
+      applyMatrix resetMatrix rotate rotateX rotateY rotateZ scale shearX shearY translate
+      storeItem getItem clearStorage removeItem createStringDict createNumberDict select
+      selectAll removeElements changed input createDiv createP createSpan createImg createA
+      createSlider createButton createCheckbox createSelect createRadio createColorPicker
+      createInput createFileInput createVideo createAudio createCapture createElement
+      setMoveThreshold setShakeThreshold deviceMoved deviceTurned deviceShaken keyPressed
+      keyReleased keyTyped keyIsDown mouseMoved mouseDragged mousePressed mouseReleased
+      mouseClicked doubleClicked mouseWheel requestPointerLock exitPointerLock touchStarted
+      touchMoved touchEnded createImage saveCanvas saveFrames loadImage saveGif image tint
+      noTint imageMode blend copy filter get loadPixels set updatePixels loadJSON loadStrings
+      loadTable loadXML loadBytes httpGet httpPost httpDo createWriter save saveJSON saveStrings
+      saveTable abs ceil constrain dist exp floor lerp log mag map max min norm pow round sq
+      sqrt fract createVector noise noiseDetail noiseSeed randomSeed random randomGaussian acos
+      asin atan atan2 cos sin tan degrees radians angleMode textAlign textLeading textSize
+      textStyle textWidth textAscent textDescent textWrap loadFont text textFont append
+      arrayCopy concat reverse shorten shuffle sort splice subset float int str boolean byte
+      char unchar hex unhex join match matchAll nf nfc nfp nfs split splitTokens trim day hour
+      minute millis month second year beginGeometry endGeometry buildGeometry freeGeometry plane
+      box sphere cylinder cone ellipsoid torus orbitControl debugMode noDebugMode ambientLight
+      specularColor directionalLight pointLight imageLight panorama lights lightFalloff
+      spotLight noLights loadModel model loadShader createShader createFilterShader shader
+      resetShader texture textureMode textureWrap normalMaterial ambientMaterial
+      emissiveMaterial specularMaterial shininess metalness camera perspective linePerspective
+      ortho frustum createCamera setCamera setAttributes getAudioContext userStartAudio
+      getOutputVolume outputVolume sampleRate freqToMidi midiToFreq soundFormats saveSound
+      loadSound createConvolver setBPM
+    `.trim().split(/\s+/));
+    const p5Variables = new Set(`
+      VERSION P2D WEBGL WEBGL2 ARROW CROSS HAND MOVE TEXT WAIT HALF_PI PI QUARTER_PI TAU TWO_PI
+      DEGREES RADIANS CORNER CORNERS RADIUS RIGHT LEFT CENTER TOP BOTTOM BASELINE POINTS LINES
+      LINE_STRIP LINE_LOOP TRIANGLES TRIANGLE_FAN TRIANGLE_STRIP QUADS QUAD_STRIP TESS CLOSE
+      OPEN CHORD PIE PROJECT SQUARE ROUND BEVEL MITER RGB HSB HSL AUTO ALT BACKSPACE CONTROL
+      DELETE DOWN_ARROW ENTER ESCAPE LEFT_ARROW OPTION RETURN RIGHT_ARROW SHIFT TAB UP_ARROW
+      BLEND REMOVE ADD DARKEST LIGHTEST DIFFERENCE SUBTRACT EXCLUSION MULTIPLY SCREEN REPLACE
+      OVERLAY HARD_LIGHT SOFT_LIGHT DODGE BURN THRESHOLD GRAY OPAQUE INVERT POSTERIZE DILATE
+      ERODE BLUR NORMAL ITALIC BOLD BOLDITALIC CHAR WORD LINEAR QUADRATIC BEZIER CURVE STROKE
+      FILL TEXTURE IMMEDIATE IMAGE NEAREST REPEAT CLAMP MIRROR FLAT SMOOTH LANDSCAPE PORTRAIT
+      GRID AXES LABEL FALLBACK CONTAIN COVER UNSIGNED_BYTE UNSIGNED_INT FLOAT HALF_FLOAT RGBA
+      frameCount deltaTime focused webglVersion displayWidth displayHeight windowWidth
+      windowHeight width height disableFriendlyErrors drawingContext deviceOrientation
+      accelerationX accelerationY accelerationZ pAccelerationX pAccelerationY pAccelerationZ
+      rotationX rotationY rotationZ pRotationX pRotationY pRotationZ turnAxis keyIsPressed key
+      keyCode movedX movedY mouseX mouseY pmouseX pmouseY winMouseX winMouseY pwinMouseX
+      pwinMouseY mouseButton mouseIsPressed touches pixels soundOut
+    `.trim().split(/\s+/));
+
+    // Wrap the JavaScript mode so p5 identifiers get the same classes the
+    // web editor uses (cm-p5-function / cm-p5-variable).
+    CodeMirror.defineMode("p5js", (config) => {
+      const js = CodeMirror.getMode(config, "javascript");
+      return {
+        ...js,
+        token(stream, state) {
+          const style = js.token(stream, state);
+          // CM5 uses string-2 for both template strings and regexps.
+          if (style === "string-2" && stream.current().startsWith("/")) return "regexp";
+          if (style === "variable" || style === "def") {
+            const word = stream.current();
+            if (p5Functions.has(word)) return "p5-function";
+            if (p5Variables.has(word)) return "p5-variable";
+          }
+          return style;
+        },
+      };
+    });
+
     const editor = CodeMirror.fromTextArea(document.querySelector("#sketch"), {
-      mode: "javascript",
+      mode: "p5js",
+      theme: "p5-light",
       lineNumbers: true,
+      styleActiveLine: true,
+      matchBrackets: true,
       tabSize: 2,
       indentUnit: 2,
       extraKeys: {
