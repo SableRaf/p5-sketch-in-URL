@@ -35,6 +35,25 @@
       flex-direction: column;
     }
 
+    .banner {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.35rem 0.5rem 0.35rem 0.75rem;
+      background: #fff8c5;
+      border-bottom: 1px solid #d4a72c;
+      color: #7d4e00;
+      font-size: 0.85rem;
+      text-align: center;
+    }
+
+    .banner a { color: inherit; }
+    .banner p { flex: 1; margin: 0; }
+    .banner .icon-btn { width: 28px; height: 28px; flex-shrink: 0; }
+    .banner .icon-btn:hover { background: rgba(0, 0, 0, 0.08); }
+    .banner[hidden] { display: none; }
+
     header {
       display: grid;
       grid-template-columns: 1fr auto 1fr;
@@ -57,14 +76,22 @@
 
     .badge {
       padding: 0.1rem 0.45rem;
-      border: 1px solid var(--accent);
+      border: 1px solid #d4a72c;
       border-radius: 999px;
-      color: var(--accent);
+      background: #fff8c5;
+      color: #7d4e00;
       font-size: 0.7rem;
       font-weight: 600;
       letter-spacing: 0.03em;
       text-transform: uppercase;
+      font-family: inherit;
+      text-align: left;
+      white-space: nowrap;
+      cursor: pointer;
     }
+
+    .badge:focus-visible { outline: 2px solid #d4a72c; outline-offset: 1px; }
+    .badge[hidden] { display: none; }
 
     .header-side {
       display: flex;
@@ -321,6 +348,13 @@
   </style>
 </head>
 <body>
+  <div class="banner" id="banner" role="note">
+    <p><strong>Proof of concept: do not use this for real work.</strong> See <a href="https://github.com/processing/p5.js-web-editor/issues/4331" target="_blank" rel="noopener">the GitHub issue</a> for context.</p>
+    <button class="icon-btn" id="banner-close" aria-label="Dismiss warning">
+      <svg viewBox="0 0 24 24"><path d="M18 6 6 18" /><path d="M6 6l12 12" /></svg>
+    </button>
+  </div>
+
   <header>
     <div class="header-side">
       <button class="transport" id="run" data-tip="Run sketch (Ctrl/Cmd+Enter)" aria-label="Run">
@@ -335,7 +369,7 @@
       </button>
     </div>
 
-    <h1>Sketch-in-URL <span class="badge">Proof of Concept - do not use</span></h1>
+    <h1>Sketch-in-URL <button class="badge" id="badge" hidden aria-label="Proof of Concept - do not use" data-tip="Show warning">Proof of Concept - do not use</button></h1>
 
     <div class="header-side end">
       <button class="icon-btn" id="info" aria-label="About"
@@ -634,6 +668,43 @@ function draw() {
       showTip(el, 0, message);
       tipTimer = setTimeout(() => { if (tipTarget === el) hideTip(); }, 1200);
     }
+
+    // The header pill stands in for the warning banner while it's dismissed.
+    const bannerEl = document.querySelector("#banner");
+    const badgeEl = document.querySelector("#badge");
+    const badgeText = badgeEl.textContent;
+    const reduceMotion = matchMedia("(prefers-reduced-motion: reduce)");
+    let typeTimer;
+
+    // Type the pill label in letter by letter, growing the pill as it goes.
+    // The title is pinned to its final width so it stays put and the pill
+    // grows to the right.
+    const titleEl = badgeEl.parentElement;
+    function typeBadge() {
+      clearInterval(typeTimer);
+      badgeEl.textContent = badgeText;
+      titleEl.style.width = "";
+      if (reduceMotion.matches) return;
+      titleEl.style.width = `${titleEl.offsetWidth}px`;
+      let i = 0;
+      badgeEl.textContent = "";
+      typeTimer = setInterval(() => {
+        badgeEl.textContent = badgeText.slice(0, ++i);
+        if (i >= badgeText.length) {
+          clearInterval(typeTimer);
+          titleEl.style.width = "";
+        }
+      }, 30);
+    }
+
+    function showBanner(show) {
+      bannerEl.hidden = !show;
+      badgeEl.hidden = show;
+      if (!show) typeBadge();
+      editor.refresh();
+    }
+    document.querySelector("#banner-close").addEventListener("click", () => showBanner(false));
+    badgeEl.addEventListener("click", () => showBanner(true));
 
     document.querySelector("#run").addEventListener("click", run);
     document.querySelector("#stop").addEventListener("click", stop);
