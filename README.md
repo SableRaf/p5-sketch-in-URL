@@ -1,6 +1,7 @@
 # Sketch-in-URL
 
-> **Proof of Concept. Do not use for real work.**
+> [!WARNING]
+> Proof of Concept. Do not use for real work.
 
 A p5.js editor that stores the whole sketch in the URL, so you can share a sketch without an account or a server.
 
@@ -15,11 +16,7 @@ Built to explore [processing/p5.js-web-editor#4331](https://github.com/processin
 
 ## Usage
 
-Open `index.html` in a browser (or serve the folder with any static server). Edit the code, then copy the share URL from the bar at the top.
-
-- **Run / Stop**: play and stop buttons, or Ctrl/Cmd+Enter
-- **Auto-refresh**: re-runs the sketch as you type (desktop only)
-- On mobile, the editor and canvas share one view, toggled by the play/stop button
+Open `index.html` in a browser (or serve the folder with any static server). Edit the code, then copy the share URL from the bar at the top. Press play/stop to run or stop the sketch.
 
 ## Limitations
 
